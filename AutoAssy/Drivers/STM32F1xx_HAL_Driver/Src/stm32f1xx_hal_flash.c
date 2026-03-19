@@ -221,7 +221,6 @@ HAL_StatusTypeDef HAL_FLASH_Program(uint32_t TypeProgram, uint32_t Address, uint
         status = FLASH_WaitForLastOperation(FLASH_TIMEOUT_VALUE);
     
         /* If the program operation is completed, disable the PG Bit */
-
         CLEAR_BIT(FLASH->CR, FLASH_CR_PG);
 #if defined(FLASH_BANK2_END)
       }

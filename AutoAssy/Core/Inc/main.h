@@ -59,6 +59,9 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define Xilanh_Pin GPIO_PIN_2
 #define Xilanh_GPIO_Port GPIOB
+#define I1_Sensor_Pin GPIO_PIN_15
+#define I1_Sensor_GPIO_Port GPIOA
+#define I1_Sensor_EXTI_IRQn EXTI15_10_IRQn
 #define RL_Button_Pin GPIO_PIN_3
 #define RL_Button_GPIO_Port GPIOB
 #define RL_Button_EXTI_IRQn EXTI3_IRQn
