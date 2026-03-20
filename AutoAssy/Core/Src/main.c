@@ -39,9 +39,9 @@
 #define BUTTON_PRESS  0U
 #define BUTTON_RELEASE 1U
 
-#define XILANH_DOWN()  	HAL_GPIO_WritePin(Xilanh_GPIO_Port, Xilanh_Pin,GPIO_PIN_SET)
-#define XILANH_UP()		HAL_GPIO_WritePin(Xilanh_GPIO_Port, Xilanh_Pin,GPIO_PIN_RESET)
-#define XILANH_Test()	HAL_GPIO_TogglePin(Xilanh_GPIO_Port, Xilanh_Pin)
+#define XILANH_DOWN()  	HAL_GPIO_WritePin(O4_Xilanh_GPIO_Port, O4_Xilanh_Pin,GPIO_PIN_SET)
+#define XILANH_UP()		HAL_GPIO_WritePin(O4_Xilanh_GPIO_Port, O4_Xilanh_Pin,GPIO_PIN_RESET)
+#define XILANH_Test()	HAL_GPIO_TogglePin(O4_Xilanh_GPIO_Port, O4_Xilanh_Pin)
 #define Sensor_active	!HAL_GPIO_ReadPin(I1_Sensor_GPIO_Port, I1_Sensor_Pin)
 
 
@@ -51,7 +51,7 @@
 
 typedef enum {
     IDLE,           // Chưa nhấn RL → không làm gì
-    WAIT_SENSOR,    // �?ang ch�? sensor sau khi nhấn RL
+    SENSOR_ACK,    	// Đã chạm cảm biến
     COUNTING        // Sensor đã kích → đang đếm timeout
 } state_t;
 
@@ -83,38 +83,31 @@ __ALIGNED(1) volatile uint32_t G32_Timer_tick = 0;
 #if 1
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    if (GPIO_Pin == RL_Button_Pin) {
-        if (!HAL_GPIO_ReadPin(RL_Button_GPIO_Port, RL_Button_Pin)) {
+    if (GPIO_Pin == I4_Emergency_Button_Pin) {
+        if (!HAL_GPIO_ReadPin(I4_Emergency_Button_GPIO_Port, I4_Emergency_Button_Pin)) {
+            XILANH_UP();
+            G32_Timer_tick = 0;
+            system_state = IDLE;   // reset state
+        }
+    }
+    else if (GPIO_Pin == I2_Start_Button_Pin) {
+        if (!HAL_GPIO_ReadPin(I2_Start_Button_GPIO_Port, I2_Start_Button_Pin)) {
 
-            if (system_state == IDLE) {
+            if (system_state == SENSOR_ACK && Sensor_active) {
                 XILANH_DOWN();
                 G32_Timer_tick = 0;
-                system_state = WAIT_SENSOR;
+                system_state = COUNTING;
             }
-            // nếu đang WAIT_SENSOR hoặc COUNTING → b�? qua nhấn thứ 2
+            // nếu đang IDLE hoặc COUNTING nhấn nút không làm gì
         }
     }
 
     else if (GPIO_Pin == I1_Sensor_Pin) {
         if (Sensor_active) {
             if (system_state == IDLE) {
-                //XILANH_DOWN();
-                system_state = WAIT_SENSOR;
+            	G32_Timer_tick = 0;
+                system_state = SENSOR_ACK;
             }
-            if (system_state == WAIT_SENSOR) {
-                // chỉ nhận sensor 1 lần sau khi nhấn RL
-                G32_Timer_tick = 0;
-                system_state = COUNTING;
-            }
-            // nếu COUNTING hoặc IDLE → b�? qua
-        }
-    }
-
-    else if (GPIO_Pin == Emergency_Button_Pin) {
-        if (!HAL_GPIO_ReadPin(Emergency_Button_GPIO_Port, Emergency_Button_Pin)) {
-            XILANH_UP();
-            G32_Timer_tick = 0;
-            system_state = IDLE;   // reset state
         }
     }
 }
@@ -287,14 +280,14 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(Xilanh_GPIO_Port, Xilanh_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(O4_Xilanh_GPIO_Port, O4_Xilanh_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : Xilanh_Pin */
-  GPIO_InitStruct.Pin = Xilanh_Pin;
+  /*Configure GPIO pin : O4_Xilanh_Pin */
+  GPIO_InitStruct.Pin = O4_Xilanh_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
-  HAL_GPIO_Init(Xilanh_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(O4_Xilanh_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : I1_Sensor_Pin */
   GPIO_InitStruct.Pin = I1_Sensor_Pin;
@@ -302,8 +295,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(I1_Sensor_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : RL_Button_Pin Emergency_Button_Pin */
-  GPIO_InitStruct.Pin = RL_Button_Pin|Emergency_Button_Pin;
+  /*Configure GPIO pins : I2_Start_Button_Pin I4_Emergency_Button_Pin */
+  GPIO_InitStruct.Pin = I2_Start_Button_Pin|I4_Emergency_Button_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_IT_FALLING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
@@ -328,15 +321,15 @@ static void MX_GPIO_Init(void)
 #if 0
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	  if(GPIO_Pin == RL_Button_Pin){
-		  if(!HAL_GPIO_ReadPin(RL_Button_GPIO_Port, RL_Button_Pin)){
+	  if(GPIO_Pin == I2_Start_Button_Pin){
+		  if(!HAL_GPIO_ReadPin(I2_Start_Button_GPIO_Port, I2_Start_Button_Pin)){
 //			  G32_Timer_tick = 0;
 //				Sensor_stt =  BUTTON_RELEASE;
 				XILANH_DOWN();
 		  }
 	  }
-	  else if(GPIO_Pin == Emergency_Button_Pin){
-		  if(!HAL_GPIO_ReadPin(Emergency_Button_GPIO_Port, Emergency_Button_Pin)){
+	  else if(GPIO_Pin == I4_Emergency_Button_Pin){
+		  if(!HAL_GPIO_ReadPin(I4_Emergency_Button_GPIO_Port, I4_Emergency_Button_Pin)){
 			  XILANH_UP();
 			  G32_Timer_tick = 0;
 			Sensor_stt =  BUTTON_RELEASE;

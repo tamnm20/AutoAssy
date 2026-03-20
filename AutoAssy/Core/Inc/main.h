@@ -57,17 +57,17 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define Xilanh_Pin GPIO_PIN_2
-#define Xilanh_GPIO_Port GPIOB
+#define O4_Xilanh_Pin GPIO_PIN_2
+#define O4_Xilanh_GPIO_Port GPIOB
 #define I1_Sensor_Pin GPIO_PIN_15
 #define I1_Sensor_GPIO_Port GPIOA
 #define I1_Sensor_EXTI_IRQn EXTI15_10_IRQn
-#define RL_Button_Pin GPIO_PIN_3
-#define RL_Button_GPIO_Port GPIOB
-#define RL_Button_EXTI_IRQn EXTI3_IRQn
-#define Emergency_Button_Pin GPIO_PIN_5
-#define Emergency_Button_GPIO_Port GPIOB
-#define Emergency_Button_EXTI_IRQn EXTI9_5_IRQn
+#define I2_Start_Button_Pin GPIO_PIN_3
+#define I2_Start_Button_GPIO_Port GPIOB
+#define I2_Start_Button_EXTI_IRQn EXTI3_IRQn
+#define I4_Emergency_Button_Pin GPIO_PIN_5
+#define I4_Emergency_Button_GPIO_Port GPIOB
+#define I4_Emergency_Button_EXTI_IRQn EXTI9_5_IRQn
 
 /* USER CODE BEGIN Private defines */
 
