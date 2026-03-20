@@ -65,9 +65,6 @@ void Error_Handler(void);
 #define RL_Button_Pin GPIO_PIN_3
 #define RL_Button_GPIO_Port GPIOB
 #define RL_Button_EXTI_IRQn EXTI3_IRQn
-#define Sensor_Pin GPIO_PIN_4
-#define Sensor_GPIO_Port GPIOB
-#define Sensor_EXTI_IRQn EXTI4_IRQn
 #define Emergency_Button_Pin GPIO_PIN_5
 #define Emergency_Button_GPIO_Port GPIOB
 #define Emergency_Button_EXTI_IRQn EXTI9_5_IRQn
